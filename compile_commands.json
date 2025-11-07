@@ -1,0 +1,33 @@
+[
+  {
+    "arguments": [
+      "/home/zgurion/wasm/emsdk/llvm/git/build_main_64/bin/clang++",
+      "-target",
+      "wasm32-unknown-emscripten",
+      "-fignore-exceptions",
+      "-mllvm",
+      "-combiner-global-alias-analysis=false",
+      "-mllvm",
+      "-enable-emscripten-sjlj",
+      "-mllvm",
+      "-disable-lsr",
+      "--sysroot=/home/zgurion/wasm/emsdk/emscripten/main/cache/sysroot",
+      "-DEMSCRIPTEN",
+      "-Xclang",
+      "-iwithsysroot/include/fakesdl",
+      "-Xclang",
+      "-iwithsysroot/include/compat",
+      "-I/home/zgurion/wasm/include",
+      "-I./external/raylib-cpp/include",
+      "-I/home/zgurion/wasm/emsdk/upstream/emscripten/cache/sysroot/include",
+      "-O2",
+      "-c",
+      "-o",
+      "/tmp/emscripten_temp_neqfu1yh/main.o",
+      "src/main.c++"
+    ],
+    "directory": "/home/zgurion/firestarter2",
+    "file": "/home/zgurion/firestarter2/src/main.c++",
+    "output": "/tmp/emscripten_temp_neqfu1yh/main.o"
+  }
+]

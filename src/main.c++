@@ -1,19 +1,7 @@
-#include <raylib.h>
-#include <iostream>
-
-using namespace std;
+#include "core/game.h"
 
 int main() {
-  cout << "Test" << endl;
-  InitWindow(800, 600, "Test");
-
-  while (!WindowShouldClose()) {
-    BeginDrawing();
-    ClearBackground(RAYWHITE);
-    DrawText("Hello World!", 190, 200, 20, BLACK);
-    EndDrawing();
-  }
-
-  CloseWindow();
+  Game game(800, 550);
+  game.Run();
   return 0;
 }

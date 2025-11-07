@@ -1,0 +1,5 @@
+#IncludeCleaner:
+#  Skip:
+#    - "external/raylib-cpp/include/.*"
+CompileFlags:
+  Add: [-Iexternal/raylib-cpp/include, -std=c++23]
