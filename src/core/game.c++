@@ -1,5 +1,4 @@
 #include "game.h"
-#include "../utils/isoutils.h"
 #include "../world/tile.h"
 #include "../world/city.h"
 #include <raylib-cpp.hpp>
@@ -7,13 +6,15 @@
 
 Game::Game(int width, int height)
   : window(width, height, "Fire Starter 2"),
-    city(16, 16),
+    city(11, 31),
+    scoreboard(10.0f, 10.0f),
     arrowBounce(0.0f),
     bounceSpeed(3.0f) {
   cameraOffset.x = width / 2.0f;
   cameraOffset.y = height / 6.0f;
-  SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_TRILINEAR);
-  HideCursor();
+  // SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_ANISOTROPIC_16X);
+  // SetConfigFlags(FLAG_MSAA_4X_HINT);
+  // HideCursor();
   SetTargetFPS(60);
 }
 
@@ -29,9 +30,11 @@ void Game::Update() {
   
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     raylib::Vector2 mousePos = GetMousePosition();
-    Tile* clickedTile = city.GetTileAtScreen(mousePos, cameraOffset);
+    Tile* clickedTile = city.GetTileAtMouse(mousePos, cameraOffset);
     if (clickedTile) {
-      clickedTile->SetColor(BLACK);
+      if (clickedTile->HandleClick()) {
+        scoreboard.Increment();
+      }
     }
   }
 }
@@ -46,8 +49,10 @@ void Game::Render() {
   
   if (hovered) {
     hovered->Render(cameraOffset, true);
-    raylib::Vector2 tilePos = IsoUtils::GridToIso(hovered->pos) + cameraOffset;
     float bounceOffset = sin(arrowBounce) * 5.0f;
+    
+    // Calculate arrow position based on hovered tile
+    raylib::Vector2 tilePos = hovered->GetScreenPos();
     float arrowY = tilePos.y - 5.0f + bounceOffset;
     raylib::Vector2 top = {tilePos.x, arrowY};
     raylib::Vector2 left = {tilePos.x - 10.0f, arrowY - 15.0f};
@@ -58,6 +63,8 @@ void Game::Render() {
     DrawLineV(right, top, outline);
     DrawLineV(top, left, outline);
   }
+  
+  scoreboard.Render();
   
   EndDrawing();
 }

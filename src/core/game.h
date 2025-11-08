@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "../world/city.h"
+#include "../gui/scoreboard.h"
 #include <raylib.h>
 #include <raylib-cpp.hpp>
 
@@ -9,6 +10,7 @@ class Game {
   private:
     raylib::Window window;
     City city;
+    Scoreboard scoreboard;
     raylib::Vector2 cameraOffset;
     float arrowBounce;
     float bounceSpeed;

@@ -30,28 +30,18 @@ all: web
 
 $(OUT_JS) $(OUT_WASM) $(BUILD_DIR)/game.html: $(OBJECTS)
 	@mkdir -p $(BUILD_DIR)
-	# emmake handles the environment, so we can call em++ directly
+	@cp assets/cozette.ttf $(BUILD_DIR)/
 	@em++ $(OBJECTS) $(LDFLAGS) -o $(BUILD_DIR)/game.html \
-		--preload-file build/web/fire.png@fire.png
+		--preload-file build/web/fire.png@fire.png \
+		--preload-file assets/spleen.otf@spleen.otf
 	@echo "WebAssembly build complete."
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c++
 	@mkdir -p $(OBJ_DIR)/$(dir $*)
-	# emmake handles the environment, so we can call em++ directly
 	@em++ $< $(CXXFLAGS) -o $@
 	@echo "Compiled: $< -> $@"
 
-#$(OUT_JS) $(OUT_WASM): $(SOURCES)
-#	@mkdir -p $(BUILD_DIR)
-#	@bash -c "source $(EMSDK_ENV) && em++ $(SOURCES) $(CXXFLAGS) $(LDFLAGS) -o $(BUILD_DIR)/game.html \
-#		--preload-file build/web/fire.png@fire.png"
-#	@echo "WebAssembly build complete."
-
-$(OUT_HTML):
-	@echo "<!DOCTYPE html><html><body><canvas id='canvas'></canvas><script src='game.js'></script></body></html>" > $(OUT_HTML)
-	@echo "Created HTML wrapper."
-
-web: $(OUT_JS) $(OUT_WASM) $(OUT_HTML)
+web: $(OUT_JS) $(OUT_WASM) $(BUILD_DIR)/game.html
 	@echo "Web build is up to date"
 
 run: web

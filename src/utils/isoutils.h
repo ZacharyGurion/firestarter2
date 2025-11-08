@@ -5,7 +5,7 @@
 #include <raylib-cpp.hpp>
 
 namespace IsoUtils {
-  constexpr int TILE_WIDTH = 80;
+  constexpr int TILE_WIDTH = 64;
   constexpr int TILE_HEIGHT = TILE_WIDTH / 2;
   raylib::Vector2 GridToIso(int x, int y);
   raylib::Vector2 GridToIso(raylib::Vector2 vec);
