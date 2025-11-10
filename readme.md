@@ -1,5 +1,5 @@
 # Firestarter 2
-## Inspired by the game from FLCL
+Inspired by the game from FLCL
 
 
 # Why 2?
