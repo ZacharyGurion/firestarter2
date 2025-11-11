@@ -32,9 +32,9 @@ all: web
 
 $(OUT_JS) $(OUT_WASM) $(WEB_DIR)/game.html: $(OBJECTS)
 	@mkdir -p $(WEB_DIR)
-	@cp assets/spleen.otf $(WEB_DIR)/
-	@cp assets/favicon.ico $(WEB_DIR)/
-	@cp assets/index.html $(WEB_DIR)/
+	cp assets/spleen.otf $(WEB_DIR)/
+	cp assets/favicon.ico $(WEB_DIR)/
+	cp assets/index.html $(WEB_DIR)/
 	@em++ $(OBJECTS) $(LDFLAGS) -o $(WEB_DIR)/game.html \
 		--preload-file assets/spleen.otf@spleen.otf #\
 		# --preload-file build/web/fire.png@fire.png
