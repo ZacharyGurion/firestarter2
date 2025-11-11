@@ -3,16 +3,31 @@
 #include "../utils/isoutils.h"
 #include <raylib.h>
 #include <raylib-cpp.hpp>
+#include <random>
+#include "../entities/enemybuilding.h"
+
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_int_distribution<> distrib(1, 10);
+std::uniform_int_distribution<> enemyDistrib(0, 1);
 
 Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
   pos = raylib::Vector2(x, y);
   isLight = !((y) & 1);
   color = isLight ? GREEN : BLUE;
   status = EMPTY;
+
+  if (distrib(gen) == 2) {
+    if (enemyDistrib(gen) == 1) {
+      building = std::make_unique<EnemyBuilding>();
+    } else {
+      building = std::make_unique<Building>();
+    }
+  }
 }
 
 bool Tile::HandleClick() {
-  if (status != USED) {
+  if (status != USED && dynamic_cast<EnemyBuilding*>(building.get())) {
     status = USED;
     color = BLACK;
     return true;
@@ -32,10 +47,9 @@ void Tile::Render(raylib::Vector2 offset, bool hovered) {
   DrawTriangle(top, left, bottom, color);
 
 
-  raylib::Color borderColor = BLACK;
+  raylib::Color borderColor = GetUIColor(hovered);
   float borderWidth = 1.0f;
   if (hovered) {
-    borderColor = RED;
     borderWidth = 4.0f;
     DrawLineEx(right, bottom, borderWidth, borderColor);
     DrawLineEx(bottom, left, borderWidth, borderColor);
@@ -48,6 +62,20 @@ void Tile::Render(raylib::Vector2 offset, bool hovered) {
   // if (hovered) {
   //   DrawText(TextFormat("Tile %i, %i", (int)pos.x, (int)pos.y), 200, 100, 20, WHITE);
   // }
+  if (building) {
+    building->Render(screenPos, hovered);
+  }
+}
+
+raylib::Color Tile::GetUIColor(bool hovered) {
+  if (hovered) {
+    if (building) {
+      return building.get()->color;
+    } else {
+      return WHITE;
+    }
+  }
+  return BLACK;
 }
 
 void Tile::DrawBorder(raylib::Color c, int border, float width) {

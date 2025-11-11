@@ -6,18 +6,19 @@ SRC_DIR := src
 OBJ_DIR := build/obj
 
 SOURCES2 := $(SRC_DIR)/main.c++ \
-           $(SRC_DIR)/core/game.c++ \
-           $(SRC_DIR)/world/city.c++ \
-           $(SRC_DIR)/world/tile.c++ \
-           $(SRC_DIR)/utils/isoutils.c++
+						$(SRC_DIR)/core/game.c++ \
+						$(SRC_DIR)/world/city.c++ \
+						$(SRC_DIR)/world/tile.c++ \
+						$(SRC_DIR)/utils/isoutils.c++ \
+						$(SRC_DIR)/entities/building.c++
 
 SOURCES := $(shell find $(SRC_DIR) -name "*.c++")
 OBJECTS := $(patsubst $(SRC_DIR)/%.c++,$(OBJ_DIR)/%.o,$(SOURCES))
 
 CXXFLAGS := -I$(INCLUDE_DIR) \
-            -I./external/raylib-cpp/include \
-            -I$(HOME)/wasm/emsdk/upstream/emscripten/cache/sysroot/include \
-            -I$(SRC_DIR) \
+						-I./external/raylib-cpp/include \
+						-I$(HOME)/wasm/emsdk/upstream/emscripten/cache/sysroot/include \
+						-I$(SRC_DIR) \
 						-c -MMD -MP
 
 LDFLAGS := -L$(LIB_DIR) -lraylib -s USE_GLFW=3 -s ASYNCIFY -s WASM=1 -O2

@@ -58,7 +58,8 @@ void Game::Render() {
     raylib::Vector2 left = {tilePos.x - 10.0f, arrowY - 15.0f};
     raylib::Vector2 right = {tilePos.x + 10.0f, arrowY - 15.0f};
     raylib::Color outline = BLACK;
-    DrawTriangle(top, right, left, RED);
+    raylib::Color fillColor = hovered->GetUIColor(true);
+    DrawTriangle(top, right, left, fillColor);
     DrawLineV(left, right, outline);
     DrawLineV(right, top, outline);
     DrawLineV(top, left, outline);
