@@ -1,8 +1,9 @@
 #INCLUDE_DIR := $(HOME)/wasm/include 
 #LIB_DIR := $(HOME)/wasm/lib
 RAYLIB_SRC := external/raylib/src
-RAYLIB_OUTPUT := external/raylib-wasm
+RAYLIB_OUTPUT := build/raylib-wasm
 LIB_DIR := $(RAYLIB_OUTPUT)/lib
+INCLUDE_DIR := $(RAYLIB_OUTPUT)/include
 
 BUILD_DIR := build
 WEB_DIR := $(BUILD_DIR)/web
@@ -26,6 +27,10 @@ OUT_HTML := $(WEB_DIR)/game.html
 
 RAYLIB_LIB := $(LIB_DIR)/libraylib.a
 
+ifndef EMSDK
+$(error EMSDK is not set. Source emsdk_env or use the make.sh script.)
+endif
+
 all: check-deps web
 
 check-deps:
@@ -37,17 +42,7 @@ check-deps:
 deps: check-emsdk init-submodules build-raylib
 
 check-emsdk:
-	@if [ ! -d "$(EMSDK_DIR)" ]; then \
-		echo "Error: Emscripten SDK not found at $(EMSDK_DIR)"; \
-		echo "Clone it with: git clone https://github.com/emscripten-core/emsdk.git external/emsdk"; \
-		echo "Then run: cd external/emsdk && ./emsdk install latest && ./emsdk activate latest"; \
-		exit 1; \
-	fi
-	@if [ ! -f "$(EMSDK_DIR)/emsdk_env.sh" ]; then \
-		echo "Error: Emscripten not activated"; \
-		echo "Run: cd external/emsdk && ./emsdk install latest && ./emsdk activate latest"; \
-		exit 1; \
-	fi
+	@echo "Using EMSDK at: $(EMSDK)"
 
 init-submodules:
 	@echo "Initializing git submodules..."
@@ -61,16 +56,18 @@ clean-deps:
 	@echo "Dependencies cleaned"
 
 build-raylib: check-emsdk
-	@echo "Building raylib for WebAssembly..."
-	@if [ -f "$(RAYLIB_LIB)" ]; then \
-		echo "raylib already built at $(RAYLIB_LIB)"; \
-	else \
-		mkdir -p $(LIB_DIR) $(INCLUDE_DIR); \
-		cd $(RAYLIB_SRC) && \
-		cp $(RAYLIB_SRC)/libraylib.a $(LIB_DIR)/; \
-		cp $(RAYLIB_SRC)/raylib.h $(RAYLIB_SRC)/raymath.h $(RAYLIB_SRC)/rlgl.h $(INCLUDE_DIR)/; \
-		echo "raylib built successfully"; \
-	fi
+	@echo "Building raylib for WebAssembly"
+	@mkdir -p $(RAYLIB_OUTPUT)
+	@cd $(RAYLIB_SRC) && \
+		emmake make PLATFORM=PLATFORM_WEB \
+		USE_GLFW=YES \
+		-s USE_GLFW=3 \
+		-s ASYNCIFY=1 \
+		-s WASM=1
+	@mkdir -p $(LIB_DIR) $(INCLUDE_DIR)
+	@cp $(RAYLIB_SRC)/libraylib.web.a $(LIB_DIR)/libraylib.a
+	@cp $(RAYLIB_SRC)/*.h $(INCLUDE_DIR)/
+	@echo "Raylib WASM build completed at: $(RAYLIB_LIB)"
 
 $(OUT_JS) $(OUT_WASM) $(WEB_DIR)/game.html: $(OBJECTS)
 	@mkdir -p $(WEB_DIR)
