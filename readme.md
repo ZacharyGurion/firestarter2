@@ -22,7 +22,9 @@ If you want to use this script you will need to modify the script to use your em
 Otherwise you should just source the emsdk_env and then run make normally.
 
 1. Dependencies
-```./make.sh deps```
+```
+./make.sh deps
+```
 
 ### Using emmake
 
