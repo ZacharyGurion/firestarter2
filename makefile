@@ -31,10 +31,11 @@ all: web
 
 $(OUT_JS) $(OUT_WASM) $(BUILD_DIR)/game.html: $(OBJECTS)
 	@mkdir -p $(BUILD_DIR)
-	@cp assets/cozette.ttf $(BUILD_DIR)/
+	@cp assets/spleen.otf $(BUILD_DIR)/
+	@cp assets/favicon.ico $(BUILD_DIR)/
 	@em++ $(OBJECTS) $(LDFLAGS) -o $(BUILD_DIR)/game.html \
-		--preload-file build/web/fire.png@fire.png \
-		--preload-file assets/spleen.otf@spleen.otf
+		--preload-file assets/spleen.otf@spleen.otf #\
+		# --preload-file build/web/fire.png@fire.png
 	@echo "WebAssembly build complete."
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c++
