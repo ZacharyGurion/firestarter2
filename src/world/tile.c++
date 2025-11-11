@@ -28,6 +28,8 @@ Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
 
 bool Tile::HandleClick() {
   if (status != USED && dynamic_cast<EnemyBuilding*>(building.get())) {
+    // Destroy the enemy building
+    building.reset();
     status = USED;
     color = BLACK;
     return true;
