@@ -46,7 +46,8 @@ check-emsdk:
 
 init-submodules:
 	@echo "Initializing git submodules..."
-	@git submodule update --init --recursive
+	@git submodule update --init external/raylib
+	@git submodule update --init external/raylib-cpp
 	@echo "Submodules initialized"
 
 clean-deps:
