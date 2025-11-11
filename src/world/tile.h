@@ -25,7 +25,6 @@ class Tile {
     Tile(int x, int y);
     void Render(raylib::Vector2 offset, bool hovered = false);
     void SetColor(raylib::Color nc);
-    bool HandleClick();
     raylib::Vector2 Distance(raylib::Vector2);
     raylib::Vector2 GetScreenPos();
     void DrawBorder(raylib::Color c, int border, float width);

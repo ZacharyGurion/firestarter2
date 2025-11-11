@@ -1,6 +1,7 @@
 #include "game.h"
 #include "../world/tile.h"
 #include "../world/city.h"
+#include "../entities/enemybuilding.h"
 #include <raylib-cpp.hpp>
 #include <cmath>
 
@@ -31,8 +32,11 @@ void Game::Update() {
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     raylib::Vector2 mousePos = GetMousePosition();
     Tile* clickedTile = city.GetTileAtMouse(mousePos, cameraOffset);
-    if (clickedTile) {
-      if (clickedTile->HandleClick()) {
+    if (clickedTile && clickedTile->status != USED) {
+      if (dynamic_cast<EnemyBuilding*>(clickedTile->building.get())) {
+        clickedTile->status = USED;
+        clickedTile->color = BLACK;
+        clickedTile->building.reset();
         scoreboard.Increment();
       }
     }
