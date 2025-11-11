@@ -35,6 +35,18 @@ Otherwise you should just source the emsdk_env and then run make normally.
 ```
 
 ### Using emmake
+1. Dependencies
+```shell
+emmake make deps
+```
+2. Web
+```shell
+emmake make web
+```
+3. Run
+```shell
+emmake make run
+```
 
 
 ## Credit
