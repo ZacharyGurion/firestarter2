@@ -1,9 +1,10 @@
 EMSDK_ENV = $(HOME)/wasm/emsdk/emsdk_env.sh
 INCLUDE_DIR := $(HOME)/wasm/include 
 LIB_DIR := $(HOME)/wasm/lib
-BUILD_DIR := build/web
+BUILD_DIR := build
+WEB_DIR := $(BUILD_DIR)/web
 SRC_DIR := src
-OBJ_DIR := build/obj
+OBJ_DIR := $(BUILD_DIR)/obj
 
 SOURCES2 := $(SRC_DIR)/main.c++ \
 						$(SRC_DIR)/core/game.c++ \
@@ -23,17 +24,18 @@ CXXFLAGS := -I$(INCLUDE_DIR) \
 
 LDFLAGS := -L$(LIB_DIR) -lraylib -s USE_GLFW=3 -s ASYNCIFY -s WASM=1 -O2
 
-OUT_JS := $(BUILD_DIR)/game.js
-OUT_WASM := $(BUILD_DIR)/game.wasm
-OUT_HTML := $(BUILD_DIR)/game.html
+OUT_JS := $(WEB_DIR)/game.js
+OUT_WASM := $(WEB_DIR)/game.wasm
+OUT_HTML := $(WEB_DIR)/game.html
 
 all: web
 
-$(OUT_JS) $(OUT_WASM) $(BUILD_DIR)/game.html: $(OBJECTS)
-	@mkdir -p $(BUILD_DIR)
-	@cp assets/spleen.otf $(BUILD_DIR)/
-	@cp assets/favicon.ico $(BUILD_DIR)/
-	@em++ $(OBJECTS) $(LDFLAGS) -o $(BUILD_DIR)/game.html \
+$(OUT_JS) $(OUT_WASM) $(WEB_DIR)/game.html: $(OBJECTS)
+	@mkdir -p $(WEB_DIR)
+	@cp assets/spleen.otf $(WEB_DIR)/
+	@cp assets/favicon.ico $(WEB_DIR)/
+	@cp assets/index.html $(WEB_DIR)/
+	@em++ $(OBJECTS) $(LDFLAGS) -o $(WEB_DIR)/game.html \
 		--preload-file assets/spleen.otf@spleen.otf #\
 		# --preload-file build/web/fire.png@fire.png
 	@echo "WebAssembly build complete."
@@ -43,16 +45,23 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c++
 	@em++ $< $(CXXFLAGS) -o $@
 	@echo "Compiled: $< -> $@"
 
-web: $(OUT_JS) $(OUT_WASM) $(BUILD_DIR)/game.html
+web: $(OUT_JS) $(OUT_WASM) $(WEB_DIR)/game.html
 	@echo "Web build is up to date"
 
 run: web
 	@echo "Starting local server at http://localhost:8080"
-	@python3 -m http.server 8080 --directory $(BUILD_DIR)
+	@python3 -m http.server 8080 --directory $(WEB_DIR)
 
-clean:
-	@echo "Cleaning build directory..."
-	@rm -f $(OUT_JS) $(OUT_WASM) $(OUT_HTML)
+clean-web:
+	@echo "Cleaning web directory..."
+	@rm -rf $(WEB_DIR)
+
+clean-obj:
+	@echo "Cleaning obj directory..."
+	@rm -rf $(OBJ_DIR)
+
+clean: clean-web clean-obj
+	@echo "Cleaned build"
 
 .PHONY: all web clean run
 
