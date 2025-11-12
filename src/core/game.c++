@@ -12,8 +12,7 @@ Game::Game()
     city(11, 31),
     scoreboard(10.0f, 10.0f),
     arrowBounce(0.0f),
-    bounceSpeed(3.0f),
-    spawnTimer(0.0f) {
+    bounceSpeed(3.0f) {
       camera.offset = { GAME_WIDTH * 0.5f, GAME_HEIGHT * 0.5f };
       camera.target = { 352.0f, 240.0f };
       camera.rotation = 0.0f;
@@ -35,12 +34,36 @@ void Game::Run() {
 void Game::Update() {
   float dt = GetFrameTime();
   arrowBounce += bounceSpeed * dt;
+
+  city.Update();
   
-  spawnTimer += dt;
-  if (spawnTimer >= ENEMY_SPAWN_INTERVAL) {
-    city.SpawnEnemyBuilding();
-    spawnTimer = 0.0f;
-  }
+  // Per-frame processing
+  // auto& grid = city.GetGrid();
+  // for (auto& row : grid) {
+  //   for (auto& tile : row) {
+  //     // Handle cooldown
+  //     if (tile.status == COOLDOWN) {
+  //       tile.cooldownTimer -= dt;
+  //       if (tile.cooldownTimer <= 0) {
+  //         tile.status = EMPTY;
+  //         tile.color = tile.isLight ? GREEN : BLUE;
+  //       }
+  //     }
+  //     if (tile.status == EMPTY && !tile.building) {
+  //       if (GetRandomValue(0, 99999) < 10) {
+  //         pendingSpawns.push_back(&tile);
+  //       }
+  //     }
+  //   }
+  // }
+
+  // if (!pendingSpawns.empty()) {
+  //   Tile* tileToSpawn = pendingSpawns.back();
+  //   pendingSpawns.pop_back();
+  //   if (tileToSpawn->status == EMPTY && !tileToSpawn->building) {
+  //       tileToSpawn->building = std::make_unique<Building>(); // Spawn normal building
+  //   }
+  // }
 
   raylib::Vector2 cameraMovement(0.0f, 0.0f);
   if (IsKeyDown(KEY_W)) cameraMovement.y -= 1.0f;
@@ -56,14 +79,14 @@ void Game::Update() {
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     raylib::Vector2 mousePos = GetMousePosition();
     Tile* clickedTile = city.GetTileAtMouse(mousePos, camera);
-    if (clickedTile && clickedTile->status != USED) {
-      if (dynamic_cast<EnemyBuilding*>(clickedTile->building.get())) {
-        clickedTile->status = USED;
-        clickedTile->color = BLACK;
-        clickedTile->building.reset();
-        scoreboard.Increment();
-      }
-    }
+    clickedTile->HandleClick(scoreboard);
+    // if (clickedTile && clickedTile->cooldownTimer <= 0.001f) {
+    //   if (dynamic_cast<EnemyBuilding*>(clickedTile->building.get())) {
+    //     clickedTile->cooldownTimer = GetRandomValue(MIN_COOLDOWN*10, MAX_COOLDOWN*10)/10.0f;
+    //     clickedTile->building.reset();
+    //     scoreboard.Increment();
+    //   }
+    // }
   }
 }
 

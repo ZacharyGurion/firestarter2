@@ -16,7 +16,8 @@ OBJECTS := $(patsubst $(SRC_DIR)/%.c++,$(OBJ_DIR)/%.o,$(SOURCES))
 CXXFLAGS := -I$(RAYLIB_CPP_INCLUDE_DIR) \
 						-I$(SRC_DIR) \
 						-c -MMD -MP \
-						-I$(RAYLIB_INCLUDE_DIR)
+						-I$(RAYLIB_INCLUDE_DIR) \
+						-std=c++23
 
 LDFLAGS := -L$(RAYLIB_LIB_DIR) -lraylib -s USE_GLFW=3 -s ASYNCIFY -s WASM=1 -O2
 

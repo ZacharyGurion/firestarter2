@@ -10,7 +10,7 @@ City::City(int w, int h) : width(w), height(h) {
   for (int y = 0; y < height; y++) {
     grid[y].reserve(width);
     for (int x = 0; x < width; x++) {
-      grid[y].emplace_back(x, y);
+      grid[y].emplace_back(x, y, this);
     }
   }
 }
@@ -41,27 +41,60 @@ void City::Render(const raylib::Camera2D& camera) {
   }
 }
 
-void City::SpawnEnemyBuilding() {
-  std::vector<std::pair<int, int>> emptyTiles;
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      Tile& tile = grid[y][x];
-      if (tile.status == EMPTY && !tile.building) {
-        emptyTiles.push_back({x, y});
-      }
+void City::Update() {
+  for (auto& row : grid) {
+    for (auto& tile : row) {
+      tile.Update();
     }
   }
-  
-  // If there are empty tiles, choose one randomly and spawn an enemy building
-  if (!emptyTiles.empty()) {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, emptyTiles.size() - 1);
-    
-    int randomIndex = distrib(gen);
-    int x = emptyTiles[randomIndex].first;
-    int y = emptyTiles[randomIndex].second;
-    
-    grid[y][x].building = std::make_unique<EnemyBuilding>();
+}
+
+Tile* City::GetTile(int x, int y) {
+  if (y < 0 || y >= height) {
+    return nullptr;
   }
+  if (x < 0 || x >= width) {
+    return nullptr;
+  }
+  return &grid[y][x];
+}
+
+std::vector<Tile*> City::GetDiag(int x, int y) {
+  std::vector<Tile*> neighbors;
+  int offsets[4][2] = {{0, -2}, {1, 0}, {0, 2}, {-1, 0}};
+
+  for (const auto& offset : offsets) {
+    int nx = x + offset[0];
+    int ny = y + offset[1];
+    
+    Tile* neighbor = GetTile(nx, ny);
+    if (neighbor) {
+      neighbors.push_back(neighbor);
+    }
+  }
+  return neighbors;
+}
+
+std::vector<Tile*> City::GetOrtho(int x, int y) {
+  std::vector<Tile*> neighbors;
+  int offsets[4][2] = {{-(!(y & 1)), -1}, {(y & 1), -1}, {(y & 1), 1}, {-(!(y & 1)), 1}};
+
+  for (const auto& offset : offsets) {
+    int nx = x + offset[0];
+    int ny = y + offset[1];
+    
+    Tile* neighbor = GetTile(nx, ny);
+    if (neighbor) {
+      neighbors.push_back(neighbor);
+    }
+  }
+  return neighbors;
+}
+
+std::vector<Tile*> City::GetAdj(int x, int y) {
+  std::vector<Tile*> orth = GetOrtho(x, y);
+  std::vector<Tile*> diag = GetDiag(x, y);
+  
+  orth.insert(orth.end(), diag.begin(), diag.end());
+  return orth;
 }

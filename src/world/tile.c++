@@ -5,23 +5,26 @@
 #include <raylib-cpp.hpp>
 #include <random>
 #include "../entities/enemybuilding.h"
+#include "./city.h"
+#include <emscripten/console.h>
+#include <algorithm>
+#include <format>
+#include <string>
 
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> distrib(1, 10);
 std::uniform_int_distribution<> enemyDistrib(0, 1);
+std::uniform_real_distribution<> cooldown(MIN_COOLDOWN, MAX_COOLDOWN);
+std::uniform_int_distribution<> spread(0, SPREAD_CHANCE);
 
-Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
+Tile::Tile(int x, int y, City* city) : pos(static_cast<float>(x), static_cast<float>(y)) {
   pos = raylib::Vector2(x, y);
   isLight = !((y) & 1);
   color = isLight ? GREEN : BLUE;
-  status = EMPTY;
+  cooldownTimer = 0.0f;
+  parentCity = city;
 
-  // if (x < 3 && y < 4) {
-  //   status = USED;
-  //   color = ORANGE;
-  //   return;
-  // }
   if (distrib(gen) == 2) {
     if (enemyDistrib(gen) == 1) {
       building = std::make_unique<EnemyBuilding>();
@@ -39,8 +42,9 @@ void Tile::Render(const raylib::Camera2D& camera, bool hovered) {
   raylib::Vector2 bottom = raylib::Vector2(worldPos.x, worldPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
   raylib::Vector2 left = raylib::Vector2(worldPos.x - IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
 
-  DrawTriangle(top, bottom, right, color);
-  DrawTriangle(top, left, bottom, color);
+  raylib::Color renderColor = (cooldownTimer < 0.001f) ? color : BLACK;
+  DrawTriangle(top, bottom, right, renderColor);
+  DrawTriangle(top, left, bottom, renderColor);
 
 
   raylib::Color borderColor = GetUIColor(hovered);
@@ -49,6 +53,7 @@ void Tile::Render(const raylib::Camera2D& camera, bool hovered) {
     DrawLineEx(bottom, left, BOLD_BORDER_WIDTH, borderColor);
     DrawLineEx(left, top, BOLD_BORDER_WIDTH, borderColor);
     DrawLineEx(top, right, BOLD_BORDER_WIDTH, borderColor);
+    DrawText(TextFormat("Tile: %i, %i", (int)pos.x, (int)pos.y), 200, 50, 20, WHITE);
   } else {
     DrawLineEx(left, top, BORDER_WIDTH, borderColor);
     DrawLineEx(top, right, BORDER_WIDTH, borderColor);
@@ -56,6 +61,73 @@ void Tile::Render(const raylib::Camera2D& camera, bool hovered) {
 
   if (building) {
     building->Render(worldPos, hovered);
+  }
+}
+
+void Tile::Update() {
+  if (dynamic_cast<EnemyBuilding*>(building.get())) {
+    int tx = (int)pos.x;
+    int ty = (int)pos.y;
+
+    auto ortho = parentCity->GetOrtho(tx, ty);
+    for (Tile* neighbor : ortho) {
+      if (neighbor->building && !dynamic_cast<EnemyBuilding*>(neighbor->building.get())) {
+        if (spread(gen) < 1) {
+          neighbor->building = std::make_unique<EnemyBuilding>();
+        emscripten_out(std::format("From tile (x: {}, y: {})", (int)pos.x, (int)pos.y).c_str());
+        emscripten_out(std::format("Setting tile (x: {}, y: {}) to enemy", (int)neighbor->pos.x, (int)neighbor->pos.y).c_str());
+          // emscripten_out(std::format("From tile (x: {}, y: {})", (int)pos.x, (int)pos.y).c_str());
+          // emscripten_out(std::format("Setting tile (x: {}, y: {}) to enemy", (int)neighbor->pos.x, (int)neighbor->pos.y).c_str());
+        }
+      }
+    }
+    auto diag = parentCity->GetDiag(tx, ty);
+    for (Tile* neighbor : diag) {
+      if (neighbor->building && !dynamic_cast<EnemyBuilding*>(neighbor->building.get())) {
+        if (spread(gen)*DIAGONAL_PROBABILITY_MOD < 1) {
+          neighbor->building = std::make_unique<EnemyBuilding>();
+        emscripten_out(std::format("From tile (x: {}, y: {})", (int)pos.x, (int)pos.y).c_str());
+        emscripten_out(std::format("Setting tile (x: {}, y: {}) to enemy", (int)neighbor->pos.x, (int)neighbor->pos.y).c_str());
+          // emscripten_out(std::format("From tile (x: {}, y: {})", (int)pos.x, (int)pos.y).c_str());
+          // emscripten_out(std::format("Setting tile (x: {}, y: {}) to enemy", (int)neighbor->pos.x, (int)neighbor->pos.y).c_str());
+        }
+      }
+    }
+  }
+
+  if (cooldownTimer >= 0.001f) {
+    cooldownTimer -= GetFrameTime();
+    if (cooldownTimer <= 0) {
+      cooldownTimer = 0.0f;
+      color = isLight ? GREEN : BLUE;
+    }
+  }
+  if (cooldownTimer <= 0.001f && !building) {
+    if (GetRandomValue(0, 99999) < 3) {
+      building = std::make_unique<Building>();
+    }
+  }
+}
+
+void Tile::HandleClick(Scoreboard& scoreboard_ptr) {
+  auto ortho = parentCity->GetOrtho((int)pos.x, (int)pos.y);
+  for (Tile* neighbor : ortho) {
+    emscripten_out(std::format("Clicked tile (x: {}, y: {})", (int)neighbor->pos.x, (int)neighbor->pos.y).c_str());
+    emscripten_out(std::format("Building? {}", neighbor->building ? "true" : "false").c_str());
+    if (neighbor->building && !dynamic_cast<EnemyBuilding*>(neighbor->building.get())) {
+      if (spread(gen) < 30) {
+        neighbor->building = std::make_unique<EnemyBuilding>();
+        // emscripten_out(std::format("From tile (x: {}, y: {})", (int)pos.x, (int)pos.y).c_str());
+        // emscripten_out(std::format("Setting tile (x: {}, y: {}) to enemy", (int)neighbor->pos.x, (int)neighbor->pos.y).c_str());
+      }
+    }
+  }
+  if (cooldownTimer <= 0.001f) {
+    if (dynamic_cast<EnemyBuilding*>(building.get())) {
+      cooldownTimer = cooldown(gen);
+      building.reset();
+      scoreboard_ptr.Increment();
+    }
   }
 }
 

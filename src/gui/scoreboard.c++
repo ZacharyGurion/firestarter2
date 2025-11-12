@@ -4,7 +4,7 @@
 #include <string>
 
 raylib::Font getFont() {
-  return LoadFontEx("spleen.otf", FONT_SIZE, 0, 250);
+  return LoadFontEx("spleen.otf", FONT_SIZE, 0, 218);
 }
 
 Scoreboard::Scoreboard() 
