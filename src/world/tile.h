@@ -14,6 +14,10 @@ constexpr int BOTTOM_LEFT= 3;
 constexpr int EMPTY = 0;
 constexpr int USED = 1;
 
+constexpr float BORDER_WIDTH = 1.0f;
+constexpr float BOLD_BORDER_WIDTH = 4.0f;
+
+
 class Tile {
   public:
     raylib::Vector2 pos;

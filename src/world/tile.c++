@@ -34,26 +34,27 @@ Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
 void Tile::Render(raylib::Vector2 offset, bool hovered) {
   raylib::Vector2 screenPos = GetScreenPos();
   
-  raylib::Vector2 top = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT / 2.0f);
-  raylib::Vector2 right = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH / 2.0f, screenPos.y);
-  raylib::Vector2 bottom = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT / 2.0f);
-  raylib::Vector2 left = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH / 2.0f, screenPos.y);
+  raylib::Vector2 top = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
+  raylib::Vector2 right = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
+  raylib::Vector2 bottom = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
+  raylib::Vector2 left = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
 
   DrawTriangle(top, bottom, right, color);
   DrawTriangle(top, left, bottom, color);
 
 
   raylib::Color borderColor = GetUIColor(hovered);
-  float borderWidth = 1.0f;
   if (hovered) {
-    borderWidth = 4.0f;
-    DrawLineEx(right, bottom, borderWidth, borderColor);
-    DrawLineEx(bottom, left, borderWidth, borderColor);
+    DrawLineEx(right, bottom, BOLD_BORDER_WIDTH, borderColor);
+    DrawLineEx(bottom, left, BOLD_BORDER_WIDTH, borderColor);
+    DrawLineEx(left, top, BOLD_BORDER_WIDTH, borderColor);
+    DrawLineEx(top, right, BOLD_BORDER_WIDTH, borderColor);
+  } else {
+    DrawLineEx(left, top, BORDER_WIDTH, borderColor);
+    DrawLineEx(top, right, BORDER_WIDTH, borderColor);
   }
-  DrawLineEx(top, right, borderWidth, borderColor);
   // DrawLineEx(right, bottom, borderWidth, borderColor);
   // DrawLineEx(bottom, left, borderWidth, borderColor);
-  DrawLineEx(left, top, borderWidth, borderColor);
 
   // if (hovered) {
   //   DrawText(TextFormat("Tile %i, %i", (int)pos.x, (int)pos.y), 200, 100, 20, WHITE);
@@ -80,20 +81,20 @@ void Tile::DrawBorder(raylib::Color c, int border, float width) {
   raylib::Vector2 v2;
   switch (border) {
     case TOP_LEFT:
-      v1 = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH / 2.0f, screenPos.y);
-      v2 = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT / 2.0f);
+      v1 = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
+      v2 = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
       break;
     case TOP_RIGHT:
-      v1 = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT / 2.0f);
-      v2 = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH / 2.0f, screenPos.y);
+      v1 = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
+      v2 = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
       break;
     case BOTTOM_RIGHT:
-      v1 = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH / 2.0f, screenPos.y);
-      v2 = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT / 2.0f);
+      v1 = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
+      v2 = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
       break;
     case BOTTOM_LEFT:
-      v2 = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT / 2.0f);
-      v1 = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH / 2.0f, screenPos.y);
+      v2 = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
+      v1 = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
       break;
     default:
       return;

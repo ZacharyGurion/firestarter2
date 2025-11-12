@@ -36,7 +36,7 @@ void Scoreboard::Render() {
   
   raylib::Vector2 pointsSize = MeasureTextEx(font, std::to_string(score).c_str(), FONT_SIZE, SPACING);
 
-  DrawTextEx(font, std::to_string(score), {SCOREBOARD_WIDTH - TEXT_OFFSET - pointsSize.x, position.y + TEXT_OFFSET}, FONT_SIZE, SPACING, WHITE);
+  DrawTextEx(font, std::to_string(score), {SCOREBOARD_WIDTH - pointsSize.x, position.y + TEXT_OFFSET}, FONT_SIZE, SPACING, WHITE);
 }
 
 void Scoreboard::Increment() {
