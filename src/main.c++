@@ -1,7 +1,7 @@
 #include "core/game.h"
 
 int main() {
-  Game game(640, 480);
+  Game game;
   game.Run();
   return 0;
 }

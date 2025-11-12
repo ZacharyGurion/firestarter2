@@ -5,15 +5,14 @@
 #include <raylib-cpp.hpp>
 #include <cmath>
 
-Game::Game(int width, int height)
-  : window(width, height, "Fire Starter 2"),
+Game::Game()
+  : window(GAME_WIDTH, GAME_HEIGHT, "Fire Starter 2"),
     city(11, 31),
     scoreboard(10.0f, 10.0f),
     arrowBounce(0.0f),
     bounceSpeed(3.0f),
     spawnTimer(0.0f) {
-  cameraOffset.x = width / 2.0f;
-  cameraOffset.y = height / 6.0f;
+  // cameraOffset is now a constexpr member, initialized in game.h
   // SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_ANISOTROPIC_16X);
   // SetConfigFlags(FLAG_MSAA_4X_HINT);
   // HideCursor();
