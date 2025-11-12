@@ -14,5 +14,6 @@ class City {
     // Tile* GetTileAtScreen(raylib::Vector2 screenPos, raylib::Vector2 offset);
     Tile* GetTileAtMouse(raylib::Vector2 mousePos, raylib::Vector2 offset);
     void Render(raylib::Vector2 offset);
+    void SpawnEnemyBuilding();
 };
 #endif

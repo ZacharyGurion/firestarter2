@@ -17,6 +17,11 @@ Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
   color = isLight ? GREEN : BLUE;
   status = EMPTY;
 
+  if (x < 3 && y < 4) {
+    status = USED;
+    color = ORANGE;
+    return;
+  }
   if (distrib(gen) == 2) {
     if (enemyDistrib(gen) == 1) {
       building = std::make_unique<EnemyBuilding>();
@@ -50,9 +55,9 @@ void Tile::Render(raylib::Vector2 offset, bool hovered) {
   // DrawLineEx(bottom, left, borderWidth, borderColor);
   DrawLineEx(left, top, borderWidth, borderColor);
 
-  // if (hovered) {
-  //   DrawText(TextFormat("Tile %i, %i", (int)pos.x, (int)pos.y), 200, 100, 20, WHITE);
-  // }
+  if (hovered) {
+    DrawText(TextFormat("Tile %i, %i", (int)pos.x, (int)pos.y), 200, 100, 20, WHITE);
+  }
   if (building) {
     building->Render(screenPos, hovered);
   }

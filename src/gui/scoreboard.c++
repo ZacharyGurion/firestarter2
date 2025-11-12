@@ -3,15 +3,12 @@
 #include <raylib-cpp.hpp>
 #include <string>
 
-float fontSize = 32.0f;
-float spacing = 2.0f;
-
 raylib::Font getFont() {
-  return LoadFontEx("spleen.otf", fontSize, 0, 250);
+  return LoadFontEx("spleen.otf", FONT_SIZE, 0, 250);
 }
 
 Scoreboard::Scoreboard() 
-  : score(0), position(10.0f, 10.0f) {
+  : score(0), position(SCOREBOARD_X_OFFSET, SCOREBOARD_Y_OFFSET) {
     font = getFont();
 }
 
@@ -27,7 +24,7 @@ Scoreboard::~Scoreboard() {
 }
 
 void Scoreboard::Render() {
-  DrawRectangleRounded(raylib::Rectangle{position.x - 5, position.y - 5, 180, 40}, 0.3f, 8, DARKGRAY);
+  DrawRectangleRounded(raylib::Rectangle{position.x, position.y, SCOREBOARD_WIDTH, SCOREBOARD_HEIGHT}, 0.3f, 8, DARKGRAY);
   
   std::string text = std::to_string(score);
   
@@ -35,11 +32,11 @@ void Scoreboard::Render() {
     exit(0);
   }
   
-  DrawTextEx(font, std::string("Score: "), {position.x, position.y}, fontSize, spacing, WHITE);
+  DrawTextEx(font, std::string("Score: "), {position.x + TEXT_OFFSET, position.y + TEXT_OFFSET}, FONT_SIZE, SPACING, WHITE);
   
-  raylib::Vector2 pointsSize = MeasureTextEx(font, std::to_string(score).c_str(), fontSize, spacing);
+  raylib::Vector2 pointsSize = MeasureTextEx(font, std::to_string(score).c_str(), FONT_SIZE, SPACING);
 
-  DrawTextEx(font, std::to_string(score), {180 - 5 - pointsSize.x, position.y}, fontSize, spacing, WHITE);
+  DrawTextEx(font, std::to_string(score), {SCOREBOARD_WIDTH - TEXT_OFFSET - pointsSize.x, position.y + TEXT_OFFSET}, FONT_SIZE, SPACING, WHITE);
 }
 
 void Scoreboard::Increment() {

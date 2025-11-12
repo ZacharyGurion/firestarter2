@@ -10,7 +10,8 @@ Game::Game(int width, int height)
     city(11, 31),
     scoreboard(10.0f, 10.0f),
     arrowBounce(0.0f),
-    bounceSpeed(3.0f) {
+    bounceSpeed(3.0f),
+    spawnTimer(0.0f) {
   cameraOffset.x = width / 2.0f;
   cameraOffset.y = height / 6.0f;
   // SetTextureFilter(GetFontDefault().texture, TEXTURE_FILTER_ANISOTROPIC_16X);
@@ -28,6 +29,12 @@ void Game::Run() {
 
 void Game::Update() {
   arrowBounce += bounceSpeed * GetFrameTime();
+  
+  spawnTimer += GetFrameTime();
+  if (spawnTimer >= ENEMY_SPAWN_INTERVAL) {
+    city.SpawnEnemyBuilding();
+    spawnTimer = 0.0f;
+  }
   
   if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
     raylib::Vector2 mousePos = GetMousePosition();
@@ -53,14 +60,13 @@ void Game::Render() {
   
   if (hovered) {
     hovered->Render(cameraOffset, true);
-    float bounceOffset = sin(arrowBounce) * 5.0f;
+    float bounceOffset = sin(arrowBounce) * ARROW_AMPLITUDE;
     
-    // Calculate arrow position based on hovered tile
     raylib::Vector2 tilePos = hovered->GetScreenPos();
-    float arrowY = tilePos.y - 5.0f + bounceOffset;
+    float arrowY = tilePos.y - ARROW_AMPLITUDE + bounceOffset;
     raylib::Vector2 top = {tilePos.x, arrowY};
-    raylib::Vector2 left = {tilePos.x - 10.0f, arrowY - 15.0f};
-    raylib::Vector2 right = {tilePos.x + 10.0f, arrowY - 15.0f};
+    raylib::Vector2 left = {tilePos.x - ARROW_WIDTH, arrowY - ARROW_HEIGHT};
+    raylib::Vector2 right = {tilePos.x + ARROW_WIDTH, arrowY - ARROW_HEIGHT};
     raylib::Color outline = BLACK;
     raylib::Color fillColor = hovered->GetUIColor(true);
     DrawTriangle(top, right, left, fillColor);
