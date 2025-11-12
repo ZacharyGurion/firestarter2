@@ -17,11 +17,11 @@ Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
   color = isLight ? GREEN : BLUE;
   status = EMPTY;
 
-  if (x < 3 && y < 4) {
-    status = USED;
-    color = ORANGE;
-    return;
-  }
+  // if (x < 3 && y < 4) {
+  //   status = USED;
+  //   color = ORANGE;
+  //   return;
+  // }
   if (distrib(gen) == 2) {
     if (enemyDistrib(gen) == 1) {
       building = std::make_unique<EnemyBuilding>();
@@ -31,13 +31,13 @@ Tile::Tile(int x, int y) : pos(static_cast<float>(x), static_cast<float>(y)) {
   }
 }
 
-void Tile::Render(raylib::Vector2 offset, bool hovered) {
-  raylib::Vector2 screenPos = GetScreenPos();
+void Tile::Render(const raylib::Camera2D& camera, bool hovered) {
+  raylib::Vector2 worldPos = GetWorldPos();
   
-  raylib::Vector2 top = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
-  raylib::Vector2 right = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
-  raylib::Vector2 bottom = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
-  raylib::Vector2 left = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
+  raylib::Vector2 top = raylib::Vector2(worldPos.x, worldPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
+  raylib::Vector2 right = raylib::Vector2(worldPos.x + IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
+  raylib::Vector2 bottom = raylib::Vector2(worldPos.x, worldPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
+  raylib::Vector2 left = raylib::Vector2(worldPos.x - IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
 
   DrawTriangle(top, bottom, right, color);
   DrawTriangle(top, left, bottom, color);
@@ -53,14 +53,9 @@ void Tile::Render(raylib::Vector2 offset, bool hovered) {
     DrawLineEx(left, top, BORDER_WIDTH, borderColor);
     DrawLineEx(top, right, BORDER_WIDTH, borderColor);
   }
-  // DrawLineEx(right, bottom, borderWidth, borderColor);
-  // DrawLineEx(bottom, left, borderWidth, borderColor);
 
-  // if (hovered) {
-  //   DrawText(TextFormat("Tile %i, %i", (int)pos.x, (int)pos.y), 200, 100, 20, WHITE);
-  // }
   if (building) {
-    building->Render(screenPos, hovered);
+    building->Render(worldPos, hovered);
   }
 }
 
@@ -75,26 +70,26 @@ raylib::Color Tile::GetUIColor(bool hovered) {
   return BLACK;
 }
 
-void Tile::DrawBorder(raylib::Color c, int border, float width) {
-  raylib::Vector2 screenPos = GetScreenPos();
+void Tile::DrawBorder(raylib::Color c, int border, float width, const raylib::Camera2D& camera) {
+  raylib::Vector2 worldPos = GetWorldPos();
   raylib::Vector2 v1;
   raylib::Vector2 v2;
   switch (border) {
     case TOP_LEFT:
-      v1 = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
-      v2 = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
+      v1 = raylib::Vector2(worldPos.x - IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
+      v2 = raylib::Vector2(worldPos.x, worldPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
       break;
     case TOP_RIGHT:
-      v1 = raylib::Vector2(screenPos.x, screenPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
-      v2 = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
+      v1 = raylib::Vector2(worldPos.x, worldPos.y - IsoUtils::TILE_HEIGHT * 0.5f);
+      v2 = raylib::Vector2(worldPos.x + IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
       break;
     case BOTTOM_RIGHT:
-      v1 = raylib::Vector2(screenPos.x + IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
-      v2 = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
+      v1 = raylib::Vector2(worldPos.x + IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
+      v2 = raylib::Vector2(worldPos.x, worldPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
       break;
     case BOTTOM_LEFT:
-      v2 = raylib::Vector2(screenPos.x, screenPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
-      v1 = raylib::Vector2(screenPos.x - IsoUtils::TILE_WIDTH * 0.5f, screenPos.y);
+      v2 = raylib::Vector2(worldPos.x, worldPos.y + IsoUtils::TILE_HEIGHT * 0.5f);
+      v1 = raylib::Vector2(worldPos.x - IsoUtils::TILE_WIDTH * 0.5f, worldPos.y);
       break;
     default:
       return;
@@ -106,15 +101,19 @@ void Tile::SetColor(raylib::Color nc) {
   color = nc;
 }
 
-raylib::Vector2 Tile::Distance(raylib::Vector2 point) {
-  return GetScreenPos() - point;
+raylib::Vector2 Tile::Distance(raylib::Vector2 point, const raylib::Camera2D& camera) {
+  return GetWorldPos() - GetScreenToWorld2D(point, camera);
 }
 
-raylib::Vector2 Tile::GetScreenPos() {
+raylib::Vector2 Tile::GetWorldPos() {
   float nx = pos.x*IsoUtils::TILE_WIDTH;
   float ny = pos.y*IsoUtils::TILE_HEIGHT*0.5f;
   if (((int)pos.y) & 1) {
     nx += IsoUtils::TILE_WIDTH*0.5f;
   }
   return raylib::Vector2(nx, ny);
+}
+
+raylib::Vector2 Tile::GetScreenPos(const raylib::Camera2D& camera) {
+    return GetWorldToScreen2D(GetWorldPos(), camera);
 }

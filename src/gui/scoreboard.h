@@ -1,5 +1,4 @@
-#ifndef SCOREBOARD_H
-#define SCOREBOARD_H
+#pragma once
 
 #include <raylib-cpp.hpp>
 
@@ -25,5 +24,3 @@ class Scoreboard {
     int GetScore() const;
     void Reset();
 };
-
-#endif

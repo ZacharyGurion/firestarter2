@@ -15,13 +15,14 @@ City::City(int w, int h) : width(w), height(h) {
   }
 }
 
-Tile* City::GetTileAtMouse(raylib::Vector2 mousePos, raylib::Vector2 offset) {
+Tile* City::GetTileAtMouse(raylib::Vector2 mousePos, const raylib::Camera2D& camera) {
+  raylib::Vector2 worldMousePos = GetScreenToWorld2D(mousePos, camera);
   Tile* best = nullptr;
   float bdist = 1e9f;
   for (int y = 0; y < grid.size(); y++) {
     for (int x = 0; x < grid[y].size(); x++) {
       Tile& t = grid[y][x];
-      raylib::Vector2 distVec = t.Distance(mousePos);
+      raylib::Vector2 distVec = t.GetWorldPos() - worldMousePos;
       float dist = std::sqrt(distVec.x*distVec.x + distVec.y*distVec.y);
       if (dist < bdist) {
         bdist = dist;
@@ -29,17 +30,13 @@ Tile* City::GetTileAtMouse(raylib::Vector2 mousePos, raylib::Vector2 offset) {
       }
     }
   }
-  // DrawText(TextFormat("Position x:%i, y:%i", (int)mousePos.x, (int)mousePos.y), 200, 150, 20, WHITE);
-  // DrawText(TextFormat("Distance: %i",(int)bdist), 200, 170, 20, WHITE);
-  // raylib::Vector2 bestPos = best->GetScreenPos();
-  // DrawLine(bestPos.x, bestPos.y, (int)mousePos.x, (int)mousePos.y, RED);
   return best;
 }
 
-void City::Render(raylib::Vector2 offset) {
+void City::Render(const raylib::Camera2D& camera) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      grid[y][x].Render(offset);
+      grid[y][x].Render(camera);
     }
   }
 }

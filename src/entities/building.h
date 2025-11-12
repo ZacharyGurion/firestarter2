@@ -1,5 +1,4 @@
-#ifndef BUILDING_H
-#define BUILDING_H
+#pragma once
 
 #include <raylib.h>
 #include <raylib-cpp.hpp>
@@ -11,4 +10,3 @@ class Building {
     Color color = YELLOW;
     virtual void Render(raylib::Vector2 pos, bool hovered = false);
 };
-#endif

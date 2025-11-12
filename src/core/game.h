@@ -15,12 +15,15 @@ constexpr float ARROW_BOUNCE_SPEED = 3.0f;
 
 constexpr float ENEMY_SPAWN_INTERVAL = 2.0f;
 
+constexpr float CAMERA_MOVE_SPEED = 300.0f;
+constexpr float CAMERA_SMOOTH_FACTOR = 8.0f;
+
 class Game {
   private:
     raylib::Window window;
     City city;
     Scoreboard scoreboard;
-    raylib::Vector2 cameraOffset = { GAME_WIDTH / 2.0f, GAME_HEIGHT / 2.0f };
+    raylib::Camera2D camera;
     float arrowBounce;
     float bounceSpeed;
     float spawnTimer;

@@ -1,5 +1,4 @@
-#ifndef ENEMYBUILDING_H
-#define ENEMYBUILDING_H
+#pragma once
 
 #include "building.h"
 #include <raylib.h>
@@ -10,5 +9,3 @@ class EnemyBuilding : public Building {
     EnemyBuilding();
     void Render(raylib::Vector2 pos, bool hovered = false) override;
 };
-
-#endif

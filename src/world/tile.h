@@ -1,5 +1,4 @@
-#ifndef TILE_H
-#define TILE_H
+#pragma once
 
 #include <raylib.h>
 #include <raylib-cpp.hpp>
@@ -27,11 +26,11 @@ class Tile {
     std::unique_ptr<Building> building;
 
     Tile(int x, int y);
-    void Render(raylib::Vector2 offset, bool hovered = false);
+    void Render(const raylib::Camera2D& camera, bool hovered = false);
     void SetColor(raylib::Color nc);
-    raylib::Vector2 Distance(raylib::Vector2);
-    raylib::Vector2 GetScreenPos();
-    void DrawBorder(raylib::Color c, int border, float width);
+    raylib::Vector2 Distance(raylib::Vector2, const raylib::Camera2D& camera);
+    raylib::Vector2 GetScreenPos(const raylib::Camera2D& camera);
+    raylib::Vector2 GetWorldPos();
+    void DrawBorder(raylib::Color c, int border, float width, const raylib::Camera2D& camera);
     raylib::Color GetUIColor(bool hovered = false);
 };
-#endif

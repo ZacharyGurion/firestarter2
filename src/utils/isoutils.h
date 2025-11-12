@@ -1,5 +1,4 @@
-#ifndef ISOUTILS_H
-#define ISOUTILS_H
+#pragma once
 
 #include <raylib.h>
 #include <raylib-cpp.hpp>
@@ -13,5 +12,3 @@ namespace IsoUtils {
   raylib::Vector2 IsoToGrid(raylib::Vector2 vec);
   bool PointInDiamond(raylib::Vector2 mouse, raylib::Vector2 tilePos);
 }
-
-#endif

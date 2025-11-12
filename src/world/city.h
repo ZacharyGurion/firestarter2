@@ -1,8 +1,8 @@
-#ifndef CITY_H
-#define CITY_H
+#pragma once
 
 #include "tile.h"
 #include <vector>
+#include <raylib-cpp.hpp>
 
 class City {
   private:
@@ -11,9 +11,7 @@ class City {
     const int height;
   public:
     City(int w, int h);
-    // Tile* GetTileAtScreen(raylib::Vector2 screenPos, raylib::Vector2 offset);
-    Tile* GetTileAtMouse(raylib::Vector2 mousePos, raylib::Vector2 offset);
-    void Render(raylib::Vector2 offset);
+    Tile* GetTileAtMouse(raylib::Vector2 mousePos, const raylib::Camera2D& camera);
+    void Render(const raylib::Camera2D& camera);
     void SpawnEnemyBuilding();
 };
-#endif
